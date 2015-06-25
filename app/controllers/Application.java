@@ -4,6 +4,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import views.html.index;
+import views.html.success;
 
 import java.io.File;
 
@@ -15,14 +16,21 @@ public class Application extends Controller {
 
     public Result upload() {
         Http.MultipartFormData body = request().body().asMultipartFormData();
-        Http.MultipartFormData.FilePart submission = body.getFile("picture");
+        Http.MultipartFormData.FilePart submission = body.getFile("submission");
         if (submission != null) {
             String fileName = submission.getFilename();
-            String contentType = submission.getContentType();
             File file = submission.getFile();
-            File destination = new File("/tmp/", fileName);
+            File destination = new File("/tmp/box/", fileName);
+            destination.getParentFile().mkdirs();
             file.renameTo(destination);
-            return ok("File uploaded");
+            new Thread() {
+                public void run() {
+                    Container container = new Container(destination);
+                    Request gradingRequest = new GradingRequest(container);
+                    Grader.storeAndExecute(gradingRequest);
+                }
+            }.start();
+            return ok(success.render());
         } else {
             flash("error", "Missing file");
             return redirect(routes.Application.index());
