@@ -1,14 +1,21 @@
 package controllers;
 
+import models.Container;
+import models.Grader;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import views.html.history;
 import views.html.index;
 import views.html.success;
 
 import java.io.File;
 
 public class Application extends Controller {
+
+    public Result history() {
+        return ok(history.render(Grader.history));
+    }
 
     public Result index() {
         return ok(index.render());

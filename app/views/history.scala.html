@@ -1,0 +1,11 @@
+@(submission: List[Submission])
+
+<table border="1px">
+    @for(p <- submission) {
+        <tr>
+            <td>@p.id</td>
+            <td>@p.verdict</td>
+            <td>@p.timestamp</td>
+        </tr>
+    }
+</table>

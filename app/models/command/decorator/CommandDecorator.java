@@ -1,6 +1,6 @@
-package controllers.command.decorator;
+package models.command.decorator;
 
-import controllers.command.Command;
+import models.command.Command;
 
 import java.util.List;
 

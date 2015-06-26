@@ -1,4 +1,4 @@
-package controllers.command;
+package models.command;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,6 @@ public class EmptyCommand implements Command {
 
     @Override
     public List<String> getList() {
-        List<String> returnList = new ArrayList<>();
-        return returnList;
+        return new ArrayList<>();
     }
 }

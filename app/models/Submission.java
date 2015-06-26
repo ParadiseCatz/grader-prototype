@@ -12,13 +12,16 @@ public class Submission {
 
     @Id
     public int id;
-    public Verdict verdict;
+    public Verdict verdict = null;
     public Date timestamp;
 
-    public Submission(int id, Verdict verdict) {
+    public Submission(int id) {
         this.id = id;
-        this.verdict = verdict;
         this.timestamp = new Date();
+    }
+
+    public void setVerdict(Verdict verdict) {
+        this.verdict = verdict;
     }
 
 }

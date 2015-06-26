@@ -1,15 +1,15 @@
-package controllers;
+package models;
 
-import controllers.command.Command;
-import controllers.command.EmptyCommand;
-import controllers.command.decorator.*;
-import models.SourceCode;
-import models.SourceCodeFactory;
+import models.command.Command;
+import models.command.EmptyCommand;
+import models.command.decorator.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
@@ -20,18 +20,22 @@ public class Container {
     private static int counter = 0;
     private final int id;
     private File submission;
+    private volatile String exitCode = null;
 
     public Container(File submission) {
         this.submission = submission;
         this.id = counter++;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void init() {
         System.out.println("Creating Box-" + id);
 
         File destination = new File(submission.getParent() + "/" + id, submission.getName());
-        if (!destination.getParentFile().mkdirs()) {
-        }
+        destination.getParentFile().mkdirs();
         submission.renameTo(destination);
         submission = destination;
         run();
@@ -39,10 +43,29 @@ public class Container {
 
     public void run() {
         System.out.println("Running Box-" + id);
+        long startTime, endTime, duration, cpuTime;
         SourceCode sourceCode = SourceCodeFactory.buildSourceCode(submission.getName());
 
-        attempt((t) -> compile(t), sourceCode);
-        attempt((t) -> execute(t), sourceCode);
+        startTime = System.nanoTime();
+        ThreadMXBean compileThread = ManagementFactory.getThreadMXBean();
+        attempt(this::compile, sourceCode);
+        endTime = System.nanoTime();
+
+        duration = (endTime - startTime);
+        System.out.println("wall time: " + duration / 1000000 + "ms");
+        cpuTime = compileThread.getCurrentThreadCpuTime();
+        System.out.println("cpu time: " + cpuTime / 1000000 + "ms" + "\n");
+
+        startTime = System.nanoTime();
+        ThreadMXBean executeThread = ManagementFactory.getThreadMXBean();
+        attempt(this::execute, sourceCode);
+        endTime = System.nanoTime();
+
+        duration = (endTime - startTime);
+        System.out.println("wall time: " + duration / 1000000 + "ms");
+        cpuTime = executeThread.getCurrentThreadCpuTime();
+        System.out.println("cpu time: " + cpuTime / 1000000 + "ms" + "\n");
+
     }
 
     public void compile(SourceCode sourceCode) {
@@ -88,10 +111,10 @@ public class Container {
         command = new AddContainerMemoryLimit(command, "100M");
         command = new AddContainerImage(command, "test2");
 
-        command = new AddCommand(command, "/bin/sh");
+        command = new AddCommand(command, "/bin/bash");
         command = new AddArgument(command, "-c");
 
-        command = new AddCommand(command, sourceCode.getExecutionCommand());
+        command = new AddCommand(command, "(time " + sourceCode.getExecutionCommand() + ") &> output.txt");
 
         ProcessBuilder pb = new ProcessBuilder(command.getList());
         pb.redirectErrorStream(true);
@@ -107,7 +130,6 @@ public class Container {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        System.out.println(pb.command());
     }
 
 
@@ -125,26 +147,27 @@ public class Container {
         try {
             System.out.println("Started..");
 //            System.out.println(future.get(10, TimeUnit.SECONDS));
-            future.get(3, TimeUnit.SECONDS);
+            future.get(5, TimeUnit.SECONDS);
             System.out.println("Finished!");
         } catch (TimeoutException e) {
             future.cancel(true);
             dockerTermination = new AddArgument(dockerTermination, "-f");
-            System.out.println(id + " Terminated!");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+            System.out.println("Box-" + id + " Terminated!");
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println("Exit Code: " + getExitCode());
+        String temporaryExitCode = getExitCode();
+        System.out.print("Exit Code: " + temporaryExitCode);
         dockerTermination = new AddArgument(dockerTermination, "box" + id);
 
         try {
             Process p = new ProcessBuilder(dockerTermination.getList()).start();
-        } catch (IOException e) {
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         executor.shutdownNow();
+        exitCode = temporaryExitCode;
     }
 
     private String getExitCode() {
