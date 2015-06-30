@@ -4,12 +4,7 @@ import models.command.Command;
 import models.command.EmptyCommand;
 import models.command.decorator.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+import java.io.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
@@ -21,6 +16,7 @@ public class Container {
     private final int id;
     private File submission;
     private volatile String exitCode = null;
+    private FileInputStream testcaseThrower = null;
 
     public Container(File submission) {
         this.submission = submission;
@@ -43,29 +39,20 @@ public class Container {
 
     public void run() {
         System.out.println("Running Box-" + id);
-        long startTime, endTime, duration, cpuTime;
         SourceCode sourceCode = SourceCodeFactory.buildSourceCode(submission.getName());
 
-        startTime = System.nanoTime();
-        ThreadMXBean compileThread = ManagementFactory.getThreadMXBean();
         attempt(this::compile, sourceCode);
-        endTime = System.nanoTime();
-
-        duration = (endTime - startTime);
-        System.out.println("wall time: " + duration / 1000000 + "ms");
-        cpuTime = compileThread.getCurrentThreadCpuTime();
-        System.out.println("cpu time: " + cpuTime / 1000000 + "ms" + "\n");
-
-        startTime = System.nanoTime();
-        ThreadMXBean executeThread = ManagementFactory.getThreadMXBean();
-        attempt(this::execute, sourceCode);
-        endTime = System.nanoTime();
-
-        duration = (endTime - startTime);
-        System.out.println("wall time: " + duration / 1000000 + "ms");
-        cpuTime = executeThread.getCurrentThreadCpuTime();
-        System.out.println("cpu time: " + cpuTime / 1000000 + "ms" + "\n");
-
+        File testcaseDirectory = new File("testcase/");
+        for (File testcase : testcaseDirectory.listFiles()) {
+            try {
+                System.out.println(testcase.getName());
+                testcaseThrower = new FileInputStream(testcase);
+                attempt(this::execute, sourceCode);
+                testcaseThrower.close();
+            } catch (IOException e) {
+                System.out.println("testcase not found");
+            }
+        }
     }
 
     public void compile(SourceCode sourceCode) {
@@ -97,7 +84,6 @@ public class Container {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        System.out.println(pb.command());
     }
 
     public void execute(SourceCode sourceCode) {
@@ -105,6 +91,7 @@ public class Container {
 
         command = new AddCommand(command, "docker");
         command = new AddArgument(command, "run");
+        command = new AddArgument(command, "-i");
         command = new AddContainerNetworkMode(command, "none");
         command = new AddContainerName(command, "box" + id);
         command = new AddContainerVolume(command, submission.getParent());
@@ -114,14 +101,20 @@ public class Container {
         command = new AddCommand(command, "/bin/bash");
         command = new AddArgument(command, "-c");
 
-        command = new AddCommand(command, "(time " + sourceCode.getExecutionCommand() + ") &> output.txt");
-
+        command = new AddCommand(command, "TIMEFORMAT=OK'\n'%R' '%U' '%S && { time " + sourceCode.getExecutionCommand() + ">output.txt 2>err.txt; } &> time.txt");
+        
         ProcessBuilder pb = new ProcessBuilder(command.getList());
         pb.redirectErrorStream(true);
 
         try {
             Process proc = pb.start();
+            Writer writer = new OutputStreamWriter(proc.getOutputStream());
             Reader reader = new InputStreamReader(proc.getInputStream());
+            int c;
+            while ((c = testcaseThrower.read()) != -1) {
+                writer.write(c);
+            }
+            writer.close();
             int ch;
             while ((ch = reader.read()) != -1)
                 System.out.print((char) ch);
