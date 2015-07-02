@@ -1,17 +1,19 @@
 package controllers;
 
-import models.Container;
 import models.Grader;
+import models.Submission;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import views.html.history;
 import views.html.index;
+import views.html.submission;
 import views.html.success;
 
 import java.io.File;
 
 public class Application extends Controller {
+    File temporaryStorage;
 
     public Result history() {
         return ok(history.render(Grader.history));
@@ -21,19 +23,24 @@ public class Application extends Controller {
         return ok(index.render());
     }
 
+    public Result submission(int id) {
+        return ok(submission.render(Grader.history.get(id).getTestcases()));
+    }
+
     public Result upload() {
         Http.MultipartFormData body = request().body().asMultipartFormData();
-        Http.MultipartFormData.FilePart submission = body.getFile("submission");
-        if (submission != null) {
-            String fileName = submission.getFilename();
-            File file = submission.getFile();
-            File destination = new File("/tmp/box/", fileName);
-            destination.getParentFile().mkdirs();
-            file.renameTo(destination);
+        Http.MultipartFormData.FilePart submissionFile = body.getFile("submission");
+        if (submissionFile != null) {
+            String fileName = submissionFile.getFilename();
+            File file = submissionFile.getFile();
+            temporaryStorage = new File("/tmp/box/", fileName);
+            temporaryStorage.getParentFile().mkdirs();
+            file.renameTo(temporaryStorage);
+
             new Thread() {
                 public void run() {
-                    Container container = new Container(destination);
-                    Request gradingRequest = new GradingRequest(container);
+                    Submission submission = new Submission(temporaryStorage);
+                    Request gradingRequest = new GradingRequest(submission);
                     Grader.storeAndExecute(gradingRequest);
                 }
             }.start();

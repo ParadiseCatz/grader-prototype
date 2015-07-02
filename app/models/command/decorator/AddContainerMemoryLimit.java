@@ -8,9 +8,9 @@ import java.util.List;
  * Created by anthony on 6/25/15.
  */
 public class AddContainerMemoryLimit extends CommandDecorator {
-    private String limit;
+    private Integer limit;
 
-    public AddContainerMemoryLimit(Command decoratedCommand, String limit) {
+    public AddContainerMemoryLimit(Command decoratedCommand, Integer limit) {
         super(decoratedCommand);
         this.limit = limit;
     }

@@ -8,7 +8,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class SourceCodeFactory {
     public static SourceCode buildSourceCode(String fileName) {
-        SourceCode sourceCode = null;
+        SourceCode sourceCode;
         String ext = FilenameUtils.getExtension(fileName);
         switch (ext) {
             case "cpp":

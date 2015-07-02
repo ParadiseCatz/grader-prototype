@@ -9,7 +9,7 @@ public abstract class SourceCode {
 
     private String fileName = null;
 
-    public SourceCode(Language language) {
+    protected SourceCode(Language language) {
         this.language = language;
     }
 
@@ -27,7 +27,7 @@ public abstract class SourceCode {
         this.language = language;
     }
 
-    public String getFileName() {
+    protected String getFileName() {
         return fileName;
     }
 

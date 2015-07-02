@@ -5,6 +5,7 @@
 # Home page
 GET         /                    controllers.Application.index()
 GET         /history             controllers.Application.history()
+GET        /submission/:id        controllers.Application.submission(id: Integer)
 POST        /                    controllers.Application.upload()
 
 # Map static resources from the /public folder to the /assets URL path

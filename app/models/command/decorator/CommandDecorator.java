@@ -8,9 +8,9 @@ import java.util.List;
  * Created by anthony on 6/25/15.
  */
 abstract public class CommandDecorator implements Command {
-    protected Command decoratedCommand;
+    private Command decoratedCommand;
 
-    public CommandDecorator(Command decoratedCommand) {
+    CommandDecorator(Command decoratedCommand) {
         this.decoratedCommand = decoratedCommand;
     }
 

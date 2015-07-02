@@ -12,9 +12,7 @@ public class Grader {
     public static List<Submission> history = new ArrayList<>();
 
     public static void storeAndExecute(Request req) {
-        Submission submission = new Submission(req.getId());
-        history.add(submission);
+        history.add(req.getSubmission());
         req.execute();
-        submission.setVerdict(Verdict.AC);
     }
 }

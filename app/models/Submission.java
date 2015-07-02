@@ -1,27 +1,55 @@
 package models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.io.File;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by anthony on 6/23/15.
  */
-@Entity
 public class Submission {
 
-    @Id
+    private static int counter = 0;
     public int id;
-    public Verdict verdict = null;
     public Date timestamp;
+    private Verdict verdict = null;
+    private File file = null;
+    private Map<File, Verdict> testcases;
 
-    public Submission(int id) {
-        this.id = id;
+    public Submission(File file) {
+        testcases = new TreeMap<>();
+        this.file = file;
+        this.id = counter++;
         this.timestamp = new Date();
     }
 
-    public void setVerdict(Verdict verdict) {
+    public Map<File, Verdict> getTestcases() {
+        return this.testcases;
+    }
+
+    public Verdict getVerdict() {
+        return verdict;
+    }
+
+    protected void setVerdict(Verdict verdict) {
         this.verdict = verdict;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    protected void addTestcase(File testcase) {
+        this.testcases.put(testcase, null);
+    }
+
+    protected void setTestcaseVerdict(File testcase, Verdict verdict) {
+        this.testcases.put(testcase, verdict);
     }
 
 }

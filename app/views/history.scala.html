@@ -4,8 +4,11 @@
     @for(p <- submission) {
         <tr>
             <td>@p.id</td>
-            <td>@p.verdict</td>
+            <td>@p.getVerdict</td>
             <td>@p.timestamp</td>
+            <td>
+                <a href="@routes.Application.submission(p.id)">View</a>
+            </td>
         </tr>
     }
 </table>

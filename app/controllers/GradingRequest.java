@@ -1,17 +1,23 @@
 package controllers;
 
 import models.Container;
+import models.Submission;
 
 /**
  * Created by anthony on 6/24/15.
  */
 public class GradingRequest implements Request {
-    private Container container;
+    private Submission submission;
     private int id;
 
-    public GradingRequest(Container container) {
-        this.container = container;
-        this.id = container.getId();
+    public GradingRequest(Submission submission) {
+        this.submission = submission;
+        this.id = submission.id;
+    }
+
+    @Override
+    public Submission getSubmission() {
+        return submission;
     }
 
     @Override
@@ -21,6 +27,6 @@ public class GradingRequest implements Request {
 
     @Override    // Command
     public void execute() {
-        container.init();
+        new Container(submission);
     }
 }
