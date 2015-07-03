@@ -73,7 +73,7 @@ class Judge {
             double userTime = Double.parseDouble(tokenizer.nextToken());
             double sysTime = Double.parseDouble(tokenizer.nextToken());
 
-            return neverTimeout &= ((wallTime <= 2 * constrain.getTime()) && ((userTime + sysTime) <= constrain.getTime()) && !timeout);
+            return neverTimeout &= ((wallTime * 1000 <= 2 * constrain.getTime()) && ((userTime + sysTime) * 1000 <= constrain.getTime()) && !timeout);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return neverTimeout &= false;
