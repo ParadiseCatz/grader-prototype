@@ -98,11 +98,7 @@ public class Container {
         Command command = new EmptyCommand();
         command = new AddCommand(command, "docker");
         command = new AddArgument(command, "run");
-        command = new AddContainerNetworkMode(command, "none");
-        command = new AddContainerName(command, "box" + id);
-        command = new AddContainerVolume(command, submission.getFile().getParent());
-        command = new AddContainerMemoryLimit(command, constrain.getMemory());
-        command = new AddContainerImage(command, Play.application().configuration().getString("docker.image.name"));
+        command = addContainerParameters(command);
 
         command = new AddCommand(command, "/bin/sh");
         command = new AddArgument(command, "-c");
@@ -133,11 +129,7 @@ public class Container {
         command = new AddCommand(command, "docker");
         command = new AddArgument(command, "run");
         command = new AddArgument(command, "-i");
-        command = new AddContainerNetworkMode(command, "none");
-        command = new AddContainerName(command, "box" + id);
-        command = new AddContainerVolume(command, submission.getFile().getParent());
-        command = new AddContainerMemoryLimit(command, constrain.getMemory());
-        command = new AddContainerImage(command, Play.application().configuration().getString("docker.image.name"));
+        command = addContainerParameters(command);
 
         command = new AddCommand(command, "/bin/bash");
         command = new AddArgument(command, "-c");
@@ -238,5 +230,27 @@ public class Container {
         return Integer.parseInt(output.trim());
     }
 
+    Command addContainerParameters(Command command) {
+        command = addContainerUlimit(command);
+        command = new AddContainerNetworkMode(command, "none");
+        command = new AddContainerName(command, "box" + id);
+        command = new AddContainerVolume(command, submission.getFile().getParent());
+        command = new AddContainerMemoryLimit(command, constrain.getMemory());
+        command = new AddContainerImage(command, Play.application().configuration().getString("docker.image.name"));
+        return command;
+    }
 
+    Command addContainerUlimit(Command command) {
+        command = new AddArgument(command, "--ulimit");
+        command = new AddArgument(command, "nproc=100");
+        command = new AddArgument(command, "--ulimit");
+        command = new AddArgument(command, "nofile=50");
+        command = new AddArgument(command, "--ulimit");
+        command = new AddArgument(command, "cpu=" + (constrain.getTime() + 1000 - 1) / 1000);
+        command = new AddArgument(command, "--ulimit");
+        command = new AddArgument(command, "rss=" + constrain.getMemory());
+        command = new AddArgument(command, "--ulimit");
+        command = new AddArgument(command, "fsize=" + 1024 * 512);
+        return command;
+    }
 }
