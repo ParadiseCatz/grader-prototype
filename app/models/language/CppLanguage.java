@@ -15,7 +15,7 @@ public class CppLanguage extends SourceCode {
     @Override
     public String getCompilationCommand() {
         System.out.println("Building Cpp");
-        return "g++ " + super.getFileName() + " -o " + getExecutableName();
+        return "g++-4.9 " + super.getFileName() + " -o " + getExecutableName();
     }
 
     @Override

@@ -15,7 +15,7 @@ public class CLanguage extends SourceCode {
     @Override
     public String getCompilationCommand() {
         System.out.println("Building C");
-        return "gcc " + super.getFileName() + " -o " + getExecutableName();
+        return "gcc-4.9 " + super.getFileName() + " -o " + getExecutableName();
     }
 
     @Override
