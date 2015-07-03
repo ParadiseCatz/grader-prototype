@@ -4,6 +4,7 @@ import models.command.Command;
 import models.command.EmptyCommand;
 import models.command.decorator.*;
 import org.apache.commons.io.FilenameUtils;
+import play.Play;
 
 import java.io.*;
 import java.util.Arrays;
@@ -101,7 +102,7 @@ public class Container {
         command = new AddContainerName(command, "box" + id);
         command = new AddContainerVolume(command, submission.getFile().getParent());
         command = new AddContainerMemoryLimit(command, constrain.getMemory());
-        command = new AddContainerImage(command, "test2");
+        command = new AddContainerImage(command, Play.application().configuration().getString("docker.image.name"));
 
         command = new AddCommand(command, "/bin/sh");
         command = new AddArgument(command, "-c");
@@ -136,7 +137,7 @@ public class Container {
         command = new AddContainerName(command, "box" + id);
         command = new AddContainerVolume(command, submission.getFile().getParent());
         command = new AddContainerMemoryLimit(command, constrain.getMemory());
-        command = new AddContainerImage(command, "test2");
+        command = new AddContainerImage(command, Play.application().configuration().getString("docker.image.name"));
 
         command = new AddCommand(command, "/bin/bash");
         command = new AddArgument(command, "-c");
