@@ -10,5 +10,6 @@ public enum Language {
     PYTHON,
     JAVA,
     PHP,
-    LISP
+    LISP,
+    MAKE
 }

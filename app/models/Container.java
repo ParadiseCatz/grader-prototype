@@ -42,6 +42,7 @@ public class Container {
         destination.getParentFile().mkdirs();
         submission.getFile().renameTo(destination);
         submission.setFile(destination);
+        submission.unZipFile();
         run();
     }
 

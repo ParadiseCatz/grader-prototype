@@ -38,6 +38,10 @@ public class SourceCodeFactory {
             case "lisp":
                 sourceCode = new LispLanguage();
                 break;
+
+            case "zip":
+                sourceCode = new MakeLanguage();
+                break;
             default:
                 throw new IllegalArgumentException("Invalid language!");
         }

@@ -52,4 +52,6 @@ public class Submission {
         this.testcases.put(testcase, verdict);
     }
 
+    public void unZipFile() {
+    }
 }
