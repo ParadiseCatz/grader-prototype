@@ -241,16 +241,11 @@ public class Container {
     }
 
     Routine addContainerUlimit(Routine routine) {
-        routine = new AddArgument(routine, "--ulimit");
-        routine = new AddArgument(routine, "nproc=100");
-        routine = new AddArgument(routine, "--ulimit");
-        routine = new AddArgument(routine, "nofile=50");
-        routine = new AddArgument(routine, "--ulimit");
-        routine = new AddArgument(routine, "cpu=" + (constrain.getTime() + 1000 - 1) / 1000);
-        routine = new AddArgument(routine, "--ulimit");
-        routine = new AddArgument(routine, "rss=" + constrain.getMemory());
-        routine = new AddArgument(routine, "--ulimit");
-        routine = new AddArgument(routine, "fsize=" + 1024 * 512);
+        routine = new AddUlimitMaxProcess(routine, 100);
+        routine = new AddUlimitMaxOpenFiles(routine, 50);
+        routine = new AddUlimitMaxCpuTime(routine, (constrain.getTime() + 1000 - 1) / 1000);
+        routine = new AddUlimitMaxResources(routine, constrain.getMemory());
+        routine = new AddUlimitMaxDiskUsage(routine, 1024 * 512);
         return routine;
     }
 }
