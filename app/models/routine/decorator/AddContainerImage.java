@@ -1,17 +1,17 @@
-package models.command.decorator;
+package models.routine.decorator;
 
-import models.command.Command;
+import models.routine.Routine;
 
 import java.util.List;
 
 /**
  * Created by anthony on 6/25/15.
  */
-public class AddContainerImage extends CommandDecorator {
+public class AddContainerImage extends RoutineDecorator {
     private String imageName;
 
-    public AddContainerImage(Command decoratedCommand, String imageName) {
-        super(decoratedCommand);
+    public AddContainerImage(Routine decoratedRoutine, String imageName) {
+        super(decoratedRoutine);
         this.imageName = imageName;
     }
 

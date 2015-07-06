@@ -1,17 +1,17 @@
-package models.command.decorator;
+package models.routine.decorator;
 
-import models.command.Command;
+import models.routine.Routine;
 
 import java.util.List;
 
 /**
  * Created by anthony on 6/25/15.
  */
-public class AddContainerMemoryLimit extends CommandDecorator {
+public class AddContainerMemoryLimit extends RoutineDecorator {
     private Integer limit;
 
-    public AddContainerMemoryLimit(Command decoratedCommand, Integer limit) {
-        super(decoratedCommand);
+    public AddContainerMemoryLimit(Routine decoratedRoutine, Integer limit) {
+        super(decoratedRoutine);
         this.limit = limit;
     }
 

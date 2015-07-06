@@ -1,17 +1,17 @@
-package models.command.decorator;
+package models.routine.decorator;
 
-import models.command.Command;
+import models.routine.Routine;
 
 import java.util.List;
 
 /**
  * Created by anthony on 6/25/15.
  */
-public class AddContainerNetworkMode extends CommandDecorator {
+public class AddContainerNetworkMode extends RoutineDecorator {
     private String networkMode;
 
-    public AddContainerNetworkMode(Command decoratedCommand, String networkMode) {
-        super(decoratedCommand);
+    public AddContainerNetworkMode(Routine decoratedRoutine, String networkMode) {
+        super(decoratedRoutine);
         this.networkMode = networkMode;
     }
 

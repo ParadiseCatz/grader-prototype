@@ -1,17 +1,17 @@
-package models.command.decorator;
+package models.routine.decorator;
 
-import models.command.Command;
+import models.routine.Routine;
 
 import java.util.List;
 
 /**
  * Created by anthony on 6/25/15.
  */
-public class AddArgument extends CommandDecorator {
+public class AddArgument extends RoutineDecorator {
     private String argument;
 
-    public AddArgument(Command decoratedCommand, String argument) {
-        super(decoratedCommand);
+    public AddArgument(Routine decoratedRoutine, String argument) {
+        super(decoratedRoutine);
         this.argument = argument;
     }
 

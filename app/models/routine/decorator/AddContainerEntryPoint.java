@@ -1,17 +1,17 @@
-package models.command.decorator;
+package models.routine.decorator;
 
-import models.command.Command;
+import models.routine.Routine;
 
 import java.util.List;
 
 /**
  * Created by anthony on 6/29/15.
  */
-public class AddContainerEntryPoint extends CommandDecorator {
+public class AddContainerEntryPoint extends RoutineDecorator {
     private String entrypoint;
 
-    public AddContainerEntryPoint(Command decoratedCommand, String entrypoint) {
-        super(decoratedCommand);
+    public AddContainerEntryPoint(Routine decoratedRoutine, String entrypoint) {
+        super(decoratedRoutine);
         this.entrypoint = entrypoint;
     }
 

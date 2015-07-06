@@ -1,8 +1,8 @@
 package models;
 
-import models.command.Command;
-import models.command.EmptyCommand;
-import models.command.decorator.*;
+import models.routine.EmptyRoutine;
+import models.routine.Routine;
+import models.routine.decorator.*;
 import org.apache.commons.io.FilenameUtils;
 import play.Play;
 
@@ -95,17 +95,17 @@ public class Container {
     }
 
     void compile(SourceCode sourceCode) {
-        Command command = new EmptyCommand();
-        command = new AddCommand(command, "docker");
-        command = new AddArgument(command, "run");
-        command = addContainerParameters(command);
+        Routine routine = new EmptyRoutine();
+        routine = new AddCommand(routine, "docker");
+        routine = new AddArgument(routine, "run");
+        routine = addContainerParameters(routine);
 
-        command = new AddCommand(command, "/bin/sh");
-        command = new AddArgument(command, "-c");
+        routine = new AddCommand(routine, "/bin/sh");
+        routine = new AddArgument(routine, "-c");
 
-        command = new AddCommand(command, sourceCode.getCompilationCommand());
+        routine = new AddCommand(routine, sourceCode.getCompilationCommand());
 
-        ProcessBuilder pb = new ProcessBuilder(command.getList());
+        ProcessBuilder pb = new ProcessBuilder(routine.getList());
         pb.redirectErrorStream(true);
 
         Process proc;
@@ -124,19 +124,19 @@ public class Container {
     }
 
     void execute(SourceCode sourceCode) {
-        Command command = new EmptyCommand();
+        Routine routine = new EmptyRoutine();
 
-        command = new AddCommand(command, "docker");
-        command = new AddArgument(command, "run");
-        command = new AddArgument(command, "-i");
-        command = addContainerParameters(command);
+        routine = new AddCommand(routine, "docker");
+        routine = new AddArgument(routine, "run");
+        routine = new AddArgument(routine, "-i");
+        routine = addContainerParameters(routine);
 
-        command = new AddCommand(command, "/bin/bash");
-        command = new AddArgument(command, "-c");
+        routine = new AddCommand(routine, "/bin/bash");
+        routine = new AddArgument(routine, "-c");
 
-        command = new AddCommand(command, "TIMEFORMAT=%R' '%U' '%S && { time " + sourceCode.getExecutionCommand() + ">output.txt 2>err.txt; } &> time.txt");
+        routine = new AddCommand(routine, "TIMEFORMAT=%R' '%U' '%S && { time " + sourceCode.getExecutionCommand() + ">output.txt 2>err.txt; } &> time.txt");
 
-        ProcessBuilder pb = new ProcessBuilder(command.getList());
+        ProcessBuilder pb = new ProcessBuilder(routine.getList());
         pb.redirectErrorStream(true);
 
         Process proc;
@@ -168,9 +168,9 @@ public class Container {
             return null;
         });
 
-        Command dockerTerminationCommand = new EmptyCommand();
-        dockerTerminationCommand = new AddCommand(dockerTerminationCommand, "docker");
-        dockerTerminationCommand = new AddArgument(dockerTerminationCommand, "rm");
+        Routine dockerTerminationRoutine = new EmptyRoutine();
+        dockerTerminationRoutine = new AddCommand(dockerTerminationRoutine, "docker");
+        dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "rm");
         boolean timeout = false;
         try {
             System.out.println("Started..");
@@ -178,7 +178,7 @@ public class Container {
             System.out.println("Finished!");
         } catch (TimeoutException e) {
             future.cancel(true);
-            dockerTerminationCommand = new AddArgument(dockerTerminationCommand, "-f");
+            dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "-f");
             System.out.println("Box-" + id + " Terminated!");
             timeout = true;
         } catch (InterruptedException | ExecutionException e) {
@@ -193,10 +193,10 @@ public class Container {
         }
         int temporaryExitCode = getExitCode();
         System.out.println("Exit Code: " + temporaryExitCode);
-        dockerTerminationCommand = new AddArgument(dockerTerminationCommand, "box" + id);
+        dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "box" + id);
 
         try {
-            Process p = new ProcessBuilder(dockerTerminationCommand.getList()).start();
+            Process p = new ProcessBuilder(dockerTerminationRoutine.getList()).start();
             p.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -208,15 +208,15 @@ public class Container {
     private int getExitCode() {
         String output = "";
 
-        Command command = new EmptyCommand();
+        Routine routine = new EmptyRoutine();
 
-        command = new AddCommand(command, "docker");
-        command = new AddArgument(command, "inspect");
-        command = new AddArgument(command, "-f");
-        command = new AddArgument(command, "{{.State.ExitCode}}");
-        command = new AddArgument(command, "box" + id);
+        routine = new AddCommand(routine, "docker");
+        routine = new AddArgument(routine, "inspect");
+        routine = new AddArgument(routine, "-f");
+        routine = new AddArgument(routine, "{{.State.ExitCode}}");
+        routine = new AddArgument(routine, "box" + id);
         try {
-            Process proc = new ProcessBuilder(command.getList()).start();
+            Process proc = new ProcessBuilder(routine.getList()).start();
             proc.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String s;
@@ -230,27 +230,27 @@ public class Container {
         return Integer.parseInt(output.trim());
     }
 
-    Command addContainerParameters(Command command) {
-        command = addContainerUlimit(command);
-        command = new AddContainerNetworkMode(command, "none");
-        command = new AddContainerName(command, "box" + id);
-        command = new AddContainerVolume(command, submission.getFile().getParent());
-        command = new AddContainerMemoryLimit(command, constrain.getMemory());
-        command = new AddContainerImage(command, Play.application().configuration().getString("docker.image.name"));
-        return command;
+    Routine addContainerParameters(Routine routine) {
+        routine = addContainerUlimit(routine);
+        routine = new AddContainerNetworkMode(routine, "none");
+        routine = new AddContainerName(routine, "box" + id);
+        routine = new AddContainerVolume(routine, submission.getFile().getParent());
+        routine = new AddContainerMemoryLimit(routine, constrain.getMemory());
+        routine = new AddContainerImage(routine, Play.application().configuration().getString("docker.image.name"));
+        return routine;
     }
 
-    Command addContainerUlimit(Command command) {
-        command = new AddArgument(command, "--ulimit");
-        command = new AddArgument(command, "nproc=100");
-        command = new AddArgument(command, "--ulimit");
-        command = new AddArgument(command, "nofile=50");
-        command = new AddArgument(command, "--ulimit");
-        command = new AddArgument(command, "cpu=" + (constrain.getTime() + 1000 - 1) / 1000);
-        command = new AddArgument(command, "--ulimit");
-        command = new AddArgument(command, "rss=" + constrain.getMemory());
-        command = new AddArgument(command, "--ulimit");
-        command = new AddArgument(command, "fsize=" + 1024 * 512);
-        return command;
+    Routine addContainerUlimit(Routine routine) {
+        routine = new AddArgument(routine, "--ulimit");
+        routine = new AddArgument(routine, "nproc=100");
+        routine = new AddArgument(routine, "--ulimit");
+        routine = new AddArgument(routine, "nofile=50");
+        routine = new AddArgument(routine, "--ulimit");
+        routine = new AddArgument(routine, "cpu=" + (constrain.getTime() + 1000 - 1) / 1000);
+        routine = new AddArgument(routine, "--ulimit");
+        routine = new AddArgument(routine, "rss=" + constrain.getMemory());
+        routine = new AddArgument(routine, "--ulimit");
+        routine = new AddArgument(routine, "fsize=" + 1024 * 512);
+        return routine;
     }
 }
