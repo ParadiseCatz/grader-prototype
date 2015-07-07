@@ -17,6 +17,7 @@ How to use
 * Go to localhost:9000
 
 Testcase directory can be found in `.../testcase`.
+
 If you're giving template for submission, please include makefile with 'compile' rule for compiling submission and 'run' rule for executing submission. Put the template file in `.../template'.
 
 Configuration
