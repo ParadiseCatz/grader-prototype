@@ -1,9 +1,21 @@
+@import play.Play
+
 @helper.form(action = routes.Application.upload, 'enctype -> "multipart/form-data") {
 
 
     <!-- saved from url=(0049)https://uva.onlinejudge.org/external/11/1121.html -->
     <head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><style type="text/css"></style></head> <body>
         <h1>Sequence</h1>
+        <table>
+            <tr>
+                <td>Time Limit</td>
+                <td>@Play.application().configuration().getInt("problem.timelimit") ms</td>
+            </tr>
+            <tr>
+                <td>Memory Limit</td>
+                <td>@Play.application().configuration().getInt("problem.memorylimit") byte</td>
+            </tr>
+        </table>
         <p>A sequence of <span class="MATH"><i>N</i></span> positive integers <!-- MATH
  $(10 < N < 100 \ 000)$
  -->

@@ -35,7 +35,7 @@ public class Container {
     void init() {
         System.out.println("Creating Box-" + id);
 
-        constrain = new Constrain(200000, 268435456);
+        constrain = new Constrain(Play.application().configuration().getInt("problem.timelimit"), Play.application().configuration().getInt("problem.memorylimit"));
         judge = new Judge(id, constrain);
 
         File destination = new File(submission.getFile().getParent() + "/" + id, submission.getFile().getName());
