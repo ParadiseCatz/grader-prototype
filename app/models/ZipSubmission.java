@@ -2,11 +2,11 @@ package models;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import play.Play;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,9 +32,7 @@ public class ZipSubmission extends Submission {
     }
 
     private void mandatoryFilesOverwrite() {
-        List<String> mandatoryFileList = new ArrayList<>();
-        mandatoryFileList.add("makefile");
-        mandatoryFileList.add("main.cpp");
+        List<String> mandatoryFileList = Play.application().configuration().getStringList("mandatory.file.list");
         for (String fileName : mandatoryFileList) {
             Path FROM = Paths.get("template/" + fileName);
             Path TO = Paths.get(super.getFile().getParent() + "/" + fileName);
