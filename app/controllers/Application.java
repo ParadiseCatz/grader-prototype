@@ -16,6 +16,8 @@ import views.html.submission;
 import views.html.success;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Application extends Controller {
     File temporaryStorage;
@@ -23,6 +25,9 @@ public class Application extends Controller {
     private static File compressTemplate() {
         try {
             ZipFile zipFile = new ZipFile("template.zip");
+            if (Files.deleteIfExists(Paths.get("template.zip"))) {
+                zipFile = new ZipFile("template.zip");
+            }
 
             ZipParameters parameters = new ZipParameters();
 
