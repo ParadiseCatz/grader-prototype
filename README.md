@@ -16,4 +16,9 @@ How to use
 * Run the server using `activator run` command inside main directory
 * Go to localhost:9000
 
-Testcase directory can be found in `.../testcase`
+Testcase directory can be found in `.../testcase`. If you're giving template for submission, please use makefile with 'compile' rule for compiling submission and 'run' rule for executing submission. Put the template file in `.../template'.
+
+Configuration
+----------------
+* Time limit and memory limit of problem can be changed in `application.conf`.
+* List of file that must be overwrite when using template submission can be configure in `application.conf` on `mandatory.file.list` variable.
