@@ -69,7 +69,13 @@ class Judge {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(timeFile)));
             StringTokenizer tokenizer = new StringTokenizer(reader.readLine());
-            double wallTime = Double.parseDouble(tokenizer.nextToken());
+            double wallTime;
+            try {
+                wallTime = Double.parseDouble(tokenizer.nextToken());
+            } catch (NumberFormatException e) {
+                return neverTimeout &= false;
+            }
+
             double userTime = Double.parseDouble(tokenizer.nextToken());
             double sysTime = Double.parseDouble(tokenizer.nextToken());
 
