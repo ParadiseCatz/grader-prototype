@@ -76,12 +76,12 @@ public class Container {
                 }
                 System.out.println();
 
-                if (!judge.getRuntimePass()) {
-                    submission.setTestcaseVerdict(testcase, Verdict.RE);
-                    continue;
-                }
                 if (!judge.getTimeoutPass()) {
                     submission.setTestcaseVerdict(testcase, Verdict.TL);
+                    continue;
+                }
+                if (!judge.getRuntimePass()) {
+                    submission.setTestcaseVerdict(testcase, Verdict.RE);
                     continue;
                 }
                 if (!judge.getWrongAnswerPass()) {
