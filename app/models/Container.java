@@ -48,7 +48,13 @@ public class Container {
 
     void run() {
         System.out.println("Running Box-" + id);
-        SourceCode sourceCode = SourceCodeFactory.buildSourceCode(submission.getFile().getName());
+        SourceCode sourceCode;
+        try {
+            sourceCode = SourceCodeFactory.buildSourceCode(submission.getFile().getName());
+        } catch (IllegalArgumentException e) {
+            submission.setVerdict(Verdict.CE);
+            return;
+        }
 
         attempt(this::compile, sourceCode);
         if (!judge.getCompilationPass()) {
