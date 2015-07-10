@@ -82,6 +82,11 @@ public class ApplicationTest {
     }
 
     @Test
+    public void testCppACbf() {
+        test("test/resources/ACbf.cpp", Verdict.TL);
+    }
+
+    @Test
     public void testInvalidSubmissionType() {
         test("test/resources/invalid.docx", Verdict.CE);
     }
