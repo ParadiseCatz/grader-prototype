@@ -81,6 +81,11 @@ public class ApplicationTest {
         test("test/resources/CE.cpp", Verdict.CE);
     }
 
+    @Test
+    public void testInvalidSubmissionType() {
+        test("test/resources/invalid.docx", Verdict.CE);
+    }
+
     public void test(String filename, Verdict result) {
         running(fakeApplication(map), () -> {
             File file = new File(filename);
