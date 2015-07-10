@@ -5,14 +5,11 @@ import models.Submission;
 import models.Verdict;
 import models.ZipSubmission;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.Before;
 import org.junit.Test;
 import play.mvc.Result;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static play.mvc.Http.Status.OK;
@@ -26,15 +23,6 @@ import static play.test.Helpers.*;
 *
 */
 public class ApplicationTest {
-    Map<String, String> map = new HashMap<>();
-
-    @Before
-    public void init() {
-        map.put("docker.image.name", "paradisecatz/grader-container");
-        map.put("problem.timelimit", "10000");
-        map.put("problem.memorylimit", "268435456");
-        map.put("mandatory.file.list", "[\"makefile\", \"main.cpp\"]");
-    }
 
     @Test
     public void simpleCheck() {
@@ -87,12 +75,17 @@ public class ApplicationTest {
     }
 
     @Test
+    public void testZip() {
+        test("test/resources/template.zip", Verdict.WA);
+    }
+
+    @Test
     public void testInvalidSubmissionType() {
         test("test/resources/invalid.docx", Verdict.CE);
     }
 
     public void test(String filename, Verdict result) {
-        running(fakeApplication(map), () -> {
+        running(fakeApplication(), () -> {
             File file = new File(filename);
             File temporaryStorage = new File("/tmp/box/", file.getName());
             temporaryStorage.getParentFile().mkdirs();
