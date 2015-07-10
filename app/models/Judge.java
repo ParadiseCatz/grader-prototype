@@ -62,7 +62,9 @@ class Judge {
                 e.printStackTrace();
             }
         }
-        return neverRuntime &= (exitCode == 0);
+        boolean temporaryPass = (exitCode == 0);
+        neverRuntime &= temporaryPass;
+        return temporaryPass;
     }
 
     boolean getTimeoutPass() {
@@ -79,24 +81,31 @@ class Judge {
             double userTime = Double.parseDouble(tokenizer.nextToken());
             double sysTime = Double.parseDouble(tokenizer.nextToken());
 
-            return neverTimeout &= ((wallTime * 1000 <= 2 * constrain.getTime()) && ((userTime + sysTime) * 1000 <= constrain.getTime()) && !timeout && exitCode != 137);
+            boolean temporaryPass = ((wallTime * 1000 <= 2 * constrain.getTime()) && ((userTime + sysTime) * 1000 <= constrain.getTime()) && !timeout && exitCode != 137);
+            neverTimeout &= temporaryPass;
+            return temporaryPass;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return neverTimeout &= false;
+            neverTimeout &= false;
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
-            return neverTimeout &= false;
+            neverTimeout &= false;
+            return false;
         }
     }
 
     boolean getWrongAnswerPass() {
         File keyFile = new File(FilenameUtils.removeExtension(testcase.getAbsolutePath()) + ".out");
         try {
-            return neverWrongAnswer &= FileUtils.contentEquals(outputFile, keyFile);
+            boolean temporaryPass = FileUtils.contentEquals(outputFile, keyFile);
+            neverWrongAnswer &= temporaryPass;
+            return temporaryPass;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return neverWrongAnswer &= false;
+        neverWrongAnswer &= false;
+        return false;
     }
 
     public Verdict getOverallVerdict() {
