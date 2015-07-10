@@ -71,6 +71,16 @@ public class ApplicationTest {
         test("test/resources/TL.java", Verdict.TL);
     }
 
+    @Test
+    public void testCppTL() {
+        test("test/resources/TL.cpp", Verdict.TL);
+    }
+
+    @Test
+    public void testCppCE() {
+        test("test/resources/CE.cpp", Verdict.CE);
+    }
+
     public void test(String filename, Verdict result) {
         running(fakeApplication(map), () -> {
             File file = new File(filename);
