@@ -84,7 +84,13 @@ public class ApplicationTest {
         test("test/resources/invalid.docx", Verdict.CE);
     }
 
-    public void test(String filename, Verdict result) {
+    @Test
+    public void testMalicious() {
+        test("test/resources/Connection.java", Verdict.RE);
+        test("test/resources/Deadlock.java", Verdict.TL);
+    }
+
+    public void test(String filename, Verdict expectedResult) {
         running(fakeApplication(), () -> {
             File file = new File(filename);
             File temporaryStorage = new File("/tmp/box/", file.getName());
@@ -105,7 +111,7 @@ public class ApplicationTest {
             Request gradingRequest = new GradingRequest(submission);
             Grader.storeAndExecute(gradingRequest);
 
-            assertEquals(result, submission.getVerdict());
+            assertEquals(expectedResult, submission.getVerdict());
 
         });
     }
