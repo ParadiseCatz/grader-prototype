@@ -68,6 +68,9 @@ class Judge {
     }
 
     boolean getTimeoutPass() {
+        if (timeout) {
+            return neverTimeout &= false;
+        }
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(timeFile)));
             StringTokenizer tokenizer = new StringTokenizer(reader.readLine());

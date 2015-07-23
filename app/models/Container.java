@@ -194,7 +194,7 @@ public class Container {
         judge.setTimeoutFlag(timeout);
         executor.shutdownNow();
         try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            executor.awaitTermination(2 * constrain.getTime(), TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
