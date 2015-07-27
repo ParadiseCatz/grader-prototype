@@ -125,8 +125,10 @@ public class Container {
                 System.out.println(s);
             reader.close();
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.out.println("Compiling Terminated!");
         }
     }
 
@@ -160,9 +162,8 @@ public class Container {
                 System.out.println(s);
             reader.close();
             proc.waitFor();
-
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Execution Terminated!");
         }
     }
 
