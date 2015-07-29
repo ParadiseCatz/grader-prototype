@@ -54,4 +54,11 @@ public class Submission {
 
     public void unZipFile() {
     }
+
+    protected void moveToBox(int id) {
+        File destination = new File(file.getParent() + "/" + id, file.getName());
+        destination.getParentFile().mkdirs();
+        file.renameTo(destination);
+        file = destination;
+    }
 }

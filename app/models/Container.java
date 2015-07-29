@@ -22,31 +22,25 @@ public class Container {
     private Judge judge;
     private Constrain constrain;
 
-    public Container(Submission submission) {
+    public Container(Submission submission, Constrain constrain) {
         this.submission = submission;
+        this.constrain = constrain;
         this.id = counter++;
-        this.init();
+        this.judge = new Judge(id, constrain);
     }
 
     public int getId() {
         return id;
     }
 
-    void init() {
+    public void init() {
         System.out.println("Creating Box-" + id);
 
-        constrain = new Constrain(Play.application().configuration().getInt("problem.timelimit"), Play.application().configuration().getInt("problem.memorylimit"));
-        judge = new Judge(id, constrain);
-
-        File destination = new File(submission.getFile().getParent() + "/" + id, submission.getFile().getName());
-        destination.getParentFile().mkdirs();
-        submission.getFile().renameTo(destination);
-        submission.setFile(destination);
+        submission.moveToBox(id);
         submission.unZipFile();
-        run();
     }
 
-    void run() {
+    public void run() {
         System.out.println("Running Box-" + id);
         SourceCode sourceCode;
         try {

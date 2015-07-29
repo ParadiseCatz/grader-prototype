@@ -1,7 +1,9 @@
 package controllers;
 
+import models.Constrain;
 import models.Container;
 import models.Submission;
+import play.Play;
 
 /**
  * Created by anthony on 6/24/15.
@@ -27,6 +29,8 @@ public class GradingRequest implements Request {
 
     @Override    // Command
     public void execute() {
-        new Container(submission);
+        Container container = new Container(submission, new Constrain(Play.application().configuration().getInt("problem.timelimit"), Play.application().configuration().getInt("problem.memorylimit")));
+        container.init();
+        container.run();
     }
 }
