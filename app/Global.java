@@ -13,7 +13,8 @@ public class Global extends GlobalSettings {
         try {
             FileUtils.deleteDirectory(new File("/tmp/box"));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Cannot make temporary directory");
+            System.exit(-2);
         }
     }
 }
