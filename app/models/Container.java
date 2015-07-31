@@ -29,6 +29,14 @@ public class Container {
         this.judge = new Judge(id, constrain);
     }
 
+    public Judge getJudge() {
+        return judge;
+    }
+
+    public void setJudge(Judge judge) {
+        this.judge = judge;
+    }
+
     public int getId() {
         return id;
     }
@@ -50,7 +58,7 @@ public class Container {
             return;
         }
 
-        attempt(this::compile, sourceCode);
+        attempt(this::compile, sourceCode, "compile");
         if (!judge.getCompilationPass()) {
             submission.setVerdict(Verdict.CE);
             return;
@@ -68,7 +76,7 @@ public class Container {
                     testcaseThrower = new BufferedReader(new InputStreamReader(new FileInputStream(testcase)));
                     submission.addTestcase(testcase);
                     judge.setTestcase(testcase);
-                    attempt(this::execute, sourceCode);
+                    attempt(this::execute, sourceCode, "execute");
                     testcaseThrower.close();
                 } catch (IOException e) {
                     judge.setTestcase(null);
@@ -93,6 +101,51 @@ public class Container {
         }
         submission.setVerdict(judge.getOverallVerdict());
         System.out.println("Grading Finished");
+    }
+
+    void attempt(Consumer<SourceCode> command, SourceCode sourceCode, String commandType) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        Future<String> future = executor.submit(() -> {
+            command.accept(sourceCode);
+            return null;
+        });
+
+        Routine dockerTerminationRoutine = new EmptyRoutine();
+        dockerTerminationRoutine = new AddCommand(dockerTerminationRoutine, "docker");
+        dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "rm");
+        boolean timeout = false;
+        try {
+            System.out.println("Started..");
+            future.get(2 * constrain.getTime(), TimeUnit.MILLISECONDS);
+            System.out.println("Finished!");
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "-f");
+            System.out.println("Box-" + id + " Terminated!");
+            timeout = true;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        judge.setTimeoutFlag(timeout);
+        executor.shutdownNow();
+        try {
+            executor.awaitTermination(2 * constrain.getTime(), TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        int temporaryExitCode = getExitCode();
+        System.out.println("Exit Code: " + temporaryExitCode);
+        dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "box" + id);
+
+        try {
+            Process p = new ProcessBuilder(dockerTerminationRoutine.getList()).start();
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        judge.setExitCode(temporaryExitCode);
     }
 
     void compile(SourceCode sourceCode) {
@@ -159,52 +212,6 @@ public class Container {
         } catch (IOException | InterruptedException e) {
             System.out.println("Execution Terminated!");
         }
-    }
-
-
-    void attempt(Consumer<SourceCode> command, SourceCode sourceCode) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        Future<String> future = executor.submit(() -> {
-            command.accept(sourceCode);
-            return null;
-        });
-
-        Routine dockerTerminationRoutine = new EmptyRoutine();
-        dockerTerminationRoutine = new AddCommand(dockerTerminationRoutine, "docker");
-        dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "rm");
-        boolean timeout = false;
-        try {
-            System.out.println("Started..");
-            future.get(2 * constrain.getTime(), TimeUnit.MILLISECONDS);
-            System.out.println("Finished!");
-        } catch (TimeoutException e) {
-            future.cancel(true);
-            dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "-f");
-            System.out.println("Box-" + id + " Terminated!");
-            timeout = true;
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        judge.setTimeoutFlag(timeout);
-        executor.shutdownNow();
-        try {
-            executor.awaitTermination(2 * constrain.getTime(), TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        int temporaryExitCode = getExitCode();
-        System.out.println("Exit Code: " + temporaryExitCode);
-        dockerTerminationRoutine = new AddArgument(dockerTerminationRoutine, "box" + id);
-
-        try {
-            Process p = new ProcessBuilder(dockerTerminationRoutine.getList()).start();
-            p.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        judge.setExitCode(temporaryExitCode);
     }
 
     private int getExitCode() {

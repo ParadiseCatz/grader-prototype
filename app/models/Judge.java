@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 /**
  * Created by anthony on 6/30/15.
  */
-class Judge {
+public class Judge {
     private int id;
     private boolean timeout;
     private int exitCode;
