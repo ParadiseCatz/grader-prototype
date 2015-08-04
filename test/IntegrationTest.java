@@ -1,5 +1,18 @@
+import controllers.GradingRequest;
+import controllers.Request;
+import models.Grader;
+import models.Submission;
 import models.Verdict;
+import models.ZipSubmission;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static play.test.Helpers.fakeApplication;
+import static play.test.Helpers.running;
 
 public class IntegrationTest {
 
@@ -60,29 +73,29 @@ public class IntegrationTest {
     }
 
     public void test(String filename, Verdict expectedResult) {
-//        running(fakeApplication(), () -> {
-//            File file = new File(filename);
-//            File temporaryStorage = new File("/tmp/box/", file.getName());
-//            temporaryStorage.getParentFile().mkdirs();
-//            try {
-//                org.apache.commons.io.FileUtils.copyFile(file, temporaryStorage);
-//            } catch (IOException e) {
-//                System.out.println("Cannot create temporary directory");
-//            }
-//
-//            Submission submission;
-//
-//            if (FilenameUtils.getExtension(temporaryStorage.getName()).equals("zip")) {
-//                submission = new ZipSubmission(temporaryStorage);
-//            } else {
-//                submission = new Submission(temporaryStorage);
-//            }
-//            Request gradingRequest = new GradingRequest(submission);
-//            Grader.storeAndExecute(gradingRequest);
-//
-//            assertEquals(expectedResult, submission.getVerdict());
-//
-//        });
+        running(fakeApplication(), () -> {
+            File file = new File(filename);
+            File temporaryStorage = new File("/tmp/box/", file.getName());
+            temporaryStorage.getParentFile().mkdirs();
+            try {
+                org.apache.commons.io.FileUtils.copyFile(file, temporaryStorage);
+            } catch (IOException e) {
+                System.out.println("Cannot create temporary directory");
+            }
+
+            Submission submission;
+
+            if (FilenameUtils.getExtension(temporaryStorage.getName()).equals("zip")) {
+                submission = new ZipSubmission(temporaryStorage);
+            } else {
+                submission = new Submission(temporaryStorage);
+            }
+            Request gradingRequest = new GradingRequest(submission);
+            Grader.storeAndExecute(gradingRequest);
+
+            assertEquals(expectedResult, submission.getVerdict());
+
+        });
     }
 
 }
