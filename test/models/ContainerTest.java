@@ -1,11 +1,13 @@
 package models;
 
+import models.routine.Routine;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 import java.io.File;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static org.mockito.Mockito.*;
@@ -79,8 +81,8 @@ public class ContainerTest {
         Constrain mockedConstrain = mock(Constrain.class);
         Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
         Judge mockedJudge = mock(Judge.class);
-
         spiedContainer.setJudge(mockedJudge);
+
         when(mockedSubmission.getFile()).thenReturn(new File("AC.cpp"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("compile"));
         when(mockedJudge.getCompilationPass()).thenReturn(false);
@@ -97,8 +99,8 @@ public class ContainerTest {
         Constrain mockedConstrain = mock(Constrain.class);
         Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
         Judge mockedJudge = mock(Judge.class);
-
         spiedContainer.setJudge(mockedJudge);
+
         when(mockedSubmission.getFile()).thenReturn(new File("AC.cpp"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("compile"));
         when(mockedJudge.getCompilationPass()).thenReturn(true);
@@ -115,8 +117,8 @@ public class ContainerTest {
         Constrain mockedConstrain = mock(Constrain.class);
         Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
         Judge mockedJudge = mock(Judge.class);
-
         spiedContainer.setJudge(mockedJudge);
+
         when(mockedSubmission.getFile()).thenReturn(new File("AC.cpp"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("compile"));
         when(mockedJudge.getCompilationPass()).thenReturn(true);
@@ -133,8 +135,8 @@ public class ContainerTest {
         Constrain mockedConstrain = mock(Constrain.class);
         Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
         Judge mockedJudge = mock(Judge.class);
-
         spiedContainer.setJudge(mockedJudge);
+
         when(mockedSubmission.getFile()).thenReturn(new File("AC.cpp"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("compile"));
         when(mockedJudge.getCompilationPass()).thenReturn(true);
@@ -151,8 +153,8 @@ public class ContainerTest {
         Constrain mockedConstrain = mock(Constrain.class);
         Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
         Judge mockedJudge = mock(Judge.class);
-
         spiedContainer.setJudge(mockedJudge);
+
         when(mockedSubmission.getFile()).thenReturn(new File("AC.cpp"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("compile"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("execute"));
@@ -173,14 +175,35 @@ public class ContainerTest {
     }
 
     @Test
+    public void testSettingTimeoutFlagInAttempt() throws Exception {
+        System.out.println("Test Setting timeout flag in Container.attempt()");
+        Submission mockedSubmission = mock(Submission.class);
+        Constrain mockedConstrain = mock(Constrain.class);
+        Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
+        Judge mockedJudge = mock(Judge.class);
+        spiedContainer.setJudge(mockedJudge);
+
+        @SuppressWarnings("unchecked")
+        Consumer<SourceCode> mockedCommand = (Consumer<SourceCode>) mock(Consumer.class);
+        SourceCode mockedSourceCode = mock(SourceCode.class);
+        doThrow(TestingFAILException.class).when(mockedCommand).accept(mockedSourceCode);
+        doThrow(TestingOKException.class).doNothing().when(mockedJudge).setTimeoutFlag(anyBoolean());
+        doThrow(ExecutionException.class).when(mockedConstrain).getTime();
+
+        exception.expect(TestingOKException.class);
+        spiedContainer.attempt(eq(mockedCommand), eq(mockedSourceCode), anyString());
+    }
+
+
+    @Test
     public void testJudgeOverallVerdictInRun() throws Exception {
         System.out.println("Test Judge Overall Verdict in Container.run()");
         Submission mockedSubmission = mock(Submission.class);
         Constrain mockedConstrain = mock(Constrain.class);
         Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
         Judge mockedJudge = mock(Judge.class);
-
         spiedContainer.setJudge(mockedJudge);
+
         when(mockedSubmission.getFile()).thenReturn(new File("AC.cpp"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("compile"));
         doNothing().when(spiedContainer).attempt(any(), any(SourceCode.class), eq("execute"));
@@ -193,18 +216,39 @@ public class ContainerTest {
     }
 
     @Test
-    public void testCompile() throws Exception {
+    public void testCompileCommandInCompile() throws Exception {
+        System.out.println("Test Compile Command being called in Container.compile()");
+        Submission mockedSubmission = mock(Submission.class);
+        Constrain mockedConstrain = mock(Constrain.class);
+        Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
+        Judge mockedJudge = mock(Judge.class);
+        spiedContainer.setJudge(mockedJudge);
+        SourceCode mockedSourceCode = mock(SourceCode.class);
+        Routine mockedRoutine = mock(Routine.class);
 
+        doReturn(mockedRoutine).when(spiedContainer).addContainerParameters(any());
+        doThrow(TestingOKException.class).when(mockedSourceCode).getCompilationCommand();
+
+        exception.expect(TestingOKException.class);
+        spiedContainer.compile(mockedSourceCode);
     }
 
     @Test
-    public void testExecute() throws Exception {
+    public void testExecuteCommandInExecute() throws Exception {
+        System.out.println("Test Execute Command being called in Container.execute()");
+        Submission mockedSubmission = mock(Submission.class);
+        Constrain mockedConstrain = mock(Constrain.class);
+        Container spiedContainer = spy(new Container(mockedSubmission, mockedConstrain));
+        Judge mockedJudge = mock(Judge.class);
+        spiedContainer.setJudge(mockedJudge);
+        SourceCode mockedSourceCode = mock(SourceCode.class);
+        Routine mockedRoutine = mock(Routine.class);
 
-    }
+        doReturn(mockedRoutine).when(spiedContainer).addContainerParameters(any());
+        doThrow(TestingOKException.class).when(mockedSourceCode).getExecutionCommand();
 
-    @Test
-    public void testAttempt() throws Exception {
-
+        exception.expect(TestingOKException.class);
+        spiedContainer.execute(mockedSourceCode);
     }
 
     @Test
@@ -225,6 +269,17 @@ class TestingOKException extends Exception {
 
     //Constructor that accepts a message
     public TestingOKException(String message) {
+        super(message);
+    }
+}
+
+class TestingFAILException extends Exception {
+    //Parameterless Constructor
+    public TestingFAILException() {
+    }
+
+    //Constructor that accepts a message
+    public TestingFAILException(String message) {
         super(message);
     }
 }
