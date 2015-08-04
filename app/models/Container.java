@@ -29,10 +29,6 @@ public class Container {
         this.judge = new Judge(id, constrain);
     }
 
-    public Judge getJudge() {
-        return judge;
-    }
-
     public void setJudge(Judge judge) {
         this.judge = judge;
     }
@@ -148,7 +144,7 @@ public class Container {
         judge.setExitCode(temporaryExitCode);
     }
 
-    void compile(SourceCode sourceCode) {
+    public void compile(SourceCode sourceCode) {
         Routine routine = new EmptyRoutine();
         routine = new AddCommand(routine, "docker");
         routine = new AddArgument(routine, "run");
@@ -179,7 +175,7 @@ public class Container {
         }
     }
 
-    void execute(SourceCode sourceCode) {
+    public void execute(SourceCode sourceCode) {
         Routine routine = new EmptyRoutine();
 
         routine = new AddCommand(routine, "docker");
@@ -214,7 +210,7 @@ public class Container {
         }
     }
 
-    private int getExitCode() {
+    public int getExitCode() {
         String output = "";
 
         Routine routine = new EmptyRoutine();
@@ -239,7 +235,7 @@ public class Container {
         return Integer.parseInt(output.trim());
     }
 
-    Routine addContainerParameters(Routine routine) {
+    public Routine addContainerParameters(Routine routine) {
         routine = addContainerUlimit(routine);
         routine = new AddContainerNetworkMode(routine, "none");
         routine = new AddContainerName(routine, "box" + id);
@@ -249,7 +245,7 @@ public class Container {
         return routine;
     }
 
-    Routine addContainerUlimit(Routine routine) {
+    public Routine addContainerUlimit(Routine routine) {
         routine = new AddUlimitMaxProcess(routine, 100);
         routine = new AddUlimitMaxOpenFiles(routine, 50);
         routine = new AddUlimitMaxCpuTime(routine, (constrain.getTime() + 1000 - 1) / 1000);
