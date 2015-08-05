@@ -72,7 +72,10 @@ public class Application extends Controller {
 
     public Result upload() {
         Http.MultipartFormData body = request().body().asMultipartFormData();
-        Http.MultipartFormData.FilePart submissionFile = body.getFile("submission");
+        Http.MultipartFormData.FilePart submissionFile = null;
+        if (body != null) {
+            submissionFile = body.getFile("submission");
+        }
         if (submissionFile != null) {
             String fileName = submissionFile.getFilename();
             File file = submissionFile.getFile();

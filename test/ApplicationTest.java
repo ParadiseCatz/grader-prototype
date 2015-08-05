@@ -33,6 +33,15 @@ public class ApplicationTest {
     }
 
     @Test
+    public void testUpload() {
+        running(fakeApplication(), () -> {
+            Result result = route(controllers.routes.Application.upload());
+            assertEquals(SEE_OTHER, result.status());
+            assertEquals("/", result.redirectLocation());
+        });
+    }
+
+    @Test
     public void testMockito() {
         List mockedList;
         mockedList = mock(List.class);
