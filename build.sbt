@@ -23,3 +23,19 @@ val appDependencies = Seq(
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
+
+mappings in Universal <++= (packageBin in Compile) map { jar =>
+  val scriptsDir = new java.io.File("template/")
+  scriptsDir.listFiles.toSeq.map { f =>
+
+    f -> ("template/" + f.getName)
+  }
+}
+
+mappings in Universal <++= (packageBin in Compile) map { jar =>
+  val scriptsDir = new java.io.File("testcase/")
+  scriptsDir.listFiles.toSeq.map { f =>
+
+    f -> ("testcase/" + f.getName)
+  }
+}
