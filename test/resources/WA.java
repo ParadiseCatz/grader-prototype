@@ -3,11 +3,11 @@ import java.lang.reflect.Array;
 import java.io.*;
 
 class WA {
-	StringTokenizer tokenizer;
+    StringTokenizer tokenizer;
     BufferedReader in;
     static int NMAX = 100100;
 
-    int n, s;
+    int A, B;
     int[] pre;
 
     public void run() {
@@ -36,7 +36,7 @@ class WA {
     }
 
     long nextLong() throws NumberFormatException, IOException {
-    	return Long.parseLong(nextToken());
+        return Long.parseLong(nextToken());
     }
 
     double nextDouble() throws NumberFormatException, IOException {
@@ -48,47 +48,16 @@ class WA {
     }
 
     void initVariable() throws NumberFormatException {
-    	pre = new int[NMAX];
-    }
- 
-    void solve() throws NumberFormatException, IOException {
-    	while (true){
-            n = nextInt();
-            s = nextInt();
-            for (int i = 1; i<=n ; ++i) {
-                int x = nextInt();
-                pre[i] = x+pre[i-1];
-            }
-            int p1,p2;
-            p1 = 1;
-            p2 = 2;
-            int ans = NMAX;
-            while (p1!=p2) {
-                if (pre[p2-1] - pre[p1-1] < s) {
-                    if (p2 != n+1)
-                        p2++;
-                    else
-                        break;
-                } else {
-                    while (pre[p2-1] - pre[p1-1] >= s) {
-                        ans = Math.min(p2-p1,ans);
-                        p1++;
-                        if (p1 == p2) {
-                            break;
-                        }
-                    }
-                }
-            }
-            System.out.println("HAVAHAVA");
-            if (ans!=NMAX) {
-                System.out.println(ans);
-            } else {
-                System.out.println(0);
-            }
-        }
+        pre = new int[NMAX];
     }
 
-	public static void main(String []args) {
-		new WA().run();
-	}
+    void solve() throws NumberFormatException, IOException {
+        A = nextInt();
+        B = nextInt();
+        System.out.println(A + B + 1);
+    }
+
+    public static void main(String []args) {
+        new WA().run();
+    }
 }

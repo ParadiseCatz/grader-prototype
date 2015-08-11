@@ -13,9 +13,14 @@ public class Connection {
 	public static void main(String[] args) throws Exception {
  
 		Connection http = new Connection();
- 
-		// System.out.println("Testing 1 - Send Http GET request");
-		// http.sendGet();
+
+		try {
+			System.out.println("Testing 1 - Send Http GET request");
+			http.sendGet();
+		} catch (Exception e) {
+
+		}
+
  
 		System.out.println("\nTesting 2 - Send Http POST request");
 		http.sendPost();
