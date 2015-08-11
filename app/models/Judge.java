@@ -88,7 +88,8 @@ public class Judge {
             neverTimeout &= temporaryPass;
             return temporaryPass;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("time file not created");
             neverTimeout &= false;
             return false;
         } catch (IOException e) {
